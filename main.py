@@ -9,6 +9,8 @@ ship2 = pygame.transform.scale(ship2,(100,70))
 ship2 = pygame.transform.rotate(ship2,90)
 background = pygame.image.load("background.png")
 border = pygame.Rect(500,0, 10,700)
+font = pygame.font.SysFont("forte", 18)
+font2 = pygame.font.SysFont("forte", 30)
 class Bullet(pygame.sprite.Sprite):
     def __init__(self, x, y, colour):
         super().__init__()
@@ -17,7 +19,7 @@ class Bullet(pygame.sprite.Sprite):
     def update(self):
         if self.colour == "yellow":
             self.rect.x += 5
-            if self.rect.x > 700:
+            if self.rect.x > 1000:
                 self.kill()
         if self.colour == "red":
             self.rect.x -= 5 
@@ -76,6 +78,10 @@ while True :
     screen.blit(background, (0,0))
     screen.blit(red_ship.image, red_ship.rect.topleft)
     screen.blit(yellow_ship.image, yellow_ship.rect.topleft)
+    yellow_health = font.render(f"Yellow Health: {yellow_ship.health}", True, (245, 221, 5))
+    red_health = font.render(f"Red Health: {red_ship.health}", True, (250, 7, 24))
+    screen.blit(yellow_health, (50,50))
+    screen.blit( red_health, (800,50))
     for bullet in red_bullet:
         pygame.draw.rect(screen,"red", bullet.rect)
     for bullet in yellow_bullet:
@@ -83,13 +89,27 @@ while True :
     for bullet in yellow_bullet:
         if red_ship.rect.colliderect(bullet.rect):
             red_ship.health -= 1
+            yellow_bullet.remove(bullet)
     for bullet in red_bullet:
         if yellow_ship.rect.colliderect(bullet.rect):
             yellow_ship.health -= 1
+            red_bullet.remove(bullet)
     yellow_bullet.update()
     red_bullet.update()
     key_pressed = pygame.key.get_pressed()
     red_ship.update(key_pressed)
     yellow_ship.update(key_pressed)
+    if yellow_ship.health <= 0 :
+        gameover = font2.render("GAME OVER! RED WINS ", True, (140, 16, 14))
+        screen.blit(gameover, (500,350))
+        pygame.display.update()
+        pygame.time.delay(5000)
+        break
+    if red_ship.health <= 0 :
+        gameover = font2.render("GAME OVER! YELLOW WINS ", True, (140, 16, 14))
+        screen.blit(gameover, (350,350))
+        pygame.display.update()
+        pygame.time.delay(5000)
+        break
     pygame.draw.rect(screen, "yellow", border)
     pygame.display.update()
